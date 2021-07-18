@@ -14,7 +14,7 @@ public:
      *
      * param@resources:节点的资源情况
      *
-     * return@返回节点的综合负载评价值
+     * return@返回节点的综合负载评价值--可以进一步引申为节点的优先级
      * */
     int calculateTotalLoad(List<int> resources,);
 
