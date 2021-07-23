@@ -20,6 +20,7 @@ private:
 public:
     /*构造函数*/
     calculateTotalBalance();
+    /*delete []W问题*/
 //    ~calculateTotalBalance();
 
     /* 计算各个节点的综合负载
@@ -28,7 +29,7 @@ public:
      *
      * */
 
-    /* 获取各个节点的资源剩余情况
+    /* 1 获取各个节点的资源剩余情况
      * 包括CPU利用率、内存利用率、磁盘利用率、I/O吞吐量、网络带宽占用率、CPU核心温度
      * 虚拟内存使用率、运行中的任务数、资源能耗、响应时间等指标
      *
@@ -38,7 +39,7 @@ public:
 
 
 
-    /* 层次分析法AHP计算各计算节点的综合负载评价值
+    /* 2 层次分析法AHP计算各计算节点的综合负载评价值
      *
      * param@resources:节点的资源情况
      *
@@ -52,7 +53,7 @@ public:
     Function:calculateTotalLoad
     Description:计算节点的综合负载
     *************************************************/
-    int calculateTotalLoad();
+    double calculateTotalLoad();
 
 
 
