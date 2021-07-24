@@ -12,13 +12,17 @@ Return:矩阵的特征值和特征向量
 *************************************************/
 double* eigen(double *p,int n){    //使用和法求矩阵特征根和特征向量
     double *A1,*A2,*sum1,*sum2,*W;
-    A1=new double[n*n];
-    A2=new double[n];
-    sum1=new double[n];
-    sum2=new double[n];
-    W=new double[n+1];
+
+    /*使用new创建的指针数组需要手动使用delete[]进行删除*/
+    A1 = new double[n*n];
+    A2 = new double[n];
+    sum1 = new double[n];
+    sum2 = new double[n];
+    W = new double[n+1];// 存放特征值
+
     double sum3,sum4,lambda;
     sum3=sum4=0.0;
+
     int i,j;
 
     /*列向归一化*/
@@ -56,7 +60,16 @@ double* eigen(double *p,int n){    //使用和法求矩阵特征根和特征向�
     lambda=sum4/n;
     W[n]=lambda;
 
+    delete []A1;
+    delete []A2;
+    delete []sum1;
+    delete []sum2;
+
     return W;
+
+    /*这个不好解决--return之前调用不行，临时数组也得是动态数组，使用new创建*/
+    delete []W;
+
 }
 
 /*************************************************
@@ -77,6 +90,7 @@ double* AHP(int n,double *p,double *RI) {
 
     /*求判断矩阵的特征根及特征向量*/
     q=eigen(p,n);    //求准则层判断矩阵的特征根及特征向量
+    /*A用来暂存特征值和特征向量，q用来进行一致性判断*/
     A=q;
 
     /*一致性检验*/
@@ -105,7 +119,7 @@ double* AHP(int n,double *p,double *RI) {
     }
 
     /*返回各指标的权重值*/
-    return indicator_weights;
+    return indicator_weights;// 返回的其实是数组的首指针
 }
 
 
