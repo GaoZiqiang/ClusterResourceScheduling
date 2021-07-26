@@ -4,6 +4,9 @@ Author:gaoziqianghi@163.com
 Date:2021-07-20
 Description:计算各资源的使用、空闲情况
 **************************************************/
+#ifndef RESOURCE_INFO_UTILS_H_
+#define RESOURCE_INFO_UTILS_H_
+
 
 #include <sys/statfs.h>
 #include <mntent.h>
@@ -16,6 +19,13 @@ Description:计算各资源的使用、空闲情况
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/vfs.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <time.h>
+
+#define BUFFER_SIZE 256 // 缓冲区
+
+typedef long clock_t;
 
 using namespace std;
 
@@ -300,7 +310,7 @@ double calCPUInfo() {
 
     // sleep100毫秒
     // 100000也可以作为形参
-    long long sleep_time = 100000;
+    long long sleep_time = 1000000;
     usleep(sleep_time);
 
     //第二次获取cpu使用情况
@@ -308,3 +318,110 @@ double calCPUInfo() {
     //计算cpu使用率
     return calCPUInfoBase((CPU_OCCUPY *) &cpu_stat1, (CPU_OCCUPY *) &cpu_stat2);
 }
+
+/*************************************************
+Function:getNetworkOccupy
+Description:获取节点的网络资源使用情况--接收/发送字节总数
+
+Input@fileName:操作系统的使用配置文件 /proc/net/dev
+Return@itemResults:系统至今（当前）接收/发送字节总数
+*************************************************/
+long long* getNetworkOccupy() {
+    FILE *stream;
+    char buffer[BUFFER_SIZE];//缓冲区大小
+    char *line_return;//记录每次返回值（行）
+    int line_count = 0;//记录行数
+    char tmp_itemName[32];//临时存放文件中的每行的项目名称
+    long long itemReceive;//存放每一个网卡的接受到的字节总数（单位：Byte）
+    long long itemTransmit;//存放每一个网卡的已发送的字节总数（单位：Byte）
+
+    /*打开/proc/net/dev配置文件*/
+    if ((stream =fopen("/proc/net/dev","r")) == NULL) {
+        printf("Cannot open /proc/net/dev file!:%s\n",strerror(errno));
+        return 0;
+    }
+
+    /*先读出前两行*//*fgets()函数是按照顺序一次读取的，且处读出一行，缓冲区中就少一行*/
+    /*第一行*/
+    line_return =fgets (buffer, BUFFER_SIZE *sizeof(char), stream);//读取第一行
+
+    /*第二行*/
+    line_return =fgets (buffer, BUFFER_SIZE *sizeof(char), stream);//读取第二行
+
+    long long itemReceives = 0;// 切记：一定要初始化！！！
+    long long itemTransmits = 0;
+    while(line_return != NULL){
+        line_return =fgets (buffer, BUFFER_SIZE *sizeof(char), stream);
+        // 这里看不懂
+        sscanf( buffer,
+                "%s%lld%lld%lld%lld%lld%lld%lld%lld%lld",
+                tmp_itemName,// 该行第一列为网卡名
+                &itemReceive,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit,
+                &itemTransmit);// itemTransmit会不停的重复赋值（不停覆盖），最终得到的itemTransmit就是实际的itemTransmit，不失为一种好办法
+        itemReceives += itemReceive;
+        itemTransmits += itemTransmit;
+    }
+
+    long long* itemResults = new long long[2];
+    itemResults[0] = itemReceives;
+    itemResults[1] = itemTransmits;
+
+    return itemResults;
+}
+
+/*************************************************
+Function:calNetworkInfo
+Description:计算节点的网络带宽使用率和空闲率
+
+Input@xxx:一段时间间隔
+Return@net_free_percent:网络带宽空闲率
+*************************************************/
+double calNetworkInfo() {
+    /*网络带宽,Mbps：每秒传输百万位*/
+    static float totalBandWidth = 1000;
+
+    /*第一次采集流量数据*/
+    clock_t startTime = clock();
+
+    long long *itemResults1;
+    itemResults1 = getNetworkOccupy();
+    long long inSize1 = itemResults1[0];
+    long long outSize1 = itemResults1[1];
+
+
+    long long sleep_time = 1000000;// 延迟时间：1000毫秒
+    usleep(sleep_time);
+
+    /*第二次采集流量数据*/
+    clock_t endTime = clock();// 时间单位为毫秒
+    long long *itemResults2;
+    itemResults2 = getNetworkOccupy();
+
+    long long inSize2 = itemResults2[0];
+    long long outSize2 = itemResults2[1];
+
+    /*时间单位换算成秒*/
+    double interval = (double)(endTime - startTime) / CLOCKS_PER_SEC;// endTime - startTime为滴答数 CLOCKS_PER_SEC = 1000000
+    double sizes = (double)(inSize2 - inSize1 + outSize2 - outSize1);
+    /*计算网速，单位为MiB/s*/
+    double avg_rate = (double)(((long long)(inSize2 + outSize2 - inSize1 - outSize1) * 8) / (1000000 * interval));
+
+    printf("avg_rate:%f\n", avg_rate);
+    double net_usage = avg_rate / totalBandWidth;
+
+    printf("net_usage:%f\n", net_usage);
+
+    double net_free_percent = 1.0 - net_usage;
+    printf("net_free_percent:%f\n",net_free_percent);
+//    float totalTime = endTime - startTime;
+
+    return net_free_percent;
+}
+#endif
