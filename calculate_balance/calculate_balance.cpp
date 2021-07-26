@@ -1,5 +1,6 @@
 #include "calculate_balance.h"
 #include "../utils/eign_utils.h"
+#include "../utils/resource_info_utils.h"
 
 #include <iostream>
 
@@ -42,20 +43,29 @@ double calculateTotalBalance::calculateTotalLoad() {
     // RI对应表
     double RI[11]={0,0,0.58,0.90,1.12,1.24,1.32,1.41,1.45,1.49,1.51};
 
-    /*计算指标权重*/
-//    double *weights = new double[n];
-
+    /*2 计算指标权重*/
     double *weights;// 只需要定义一个指针数组的首指针即可（或者说只需要定义一个指针即可！！！）
     weights = AHP(n,p,RI);
-    for (int i = 0; i < n; i++)
-        cout << weights[i] << endl;
+//    for (int i = 0; i < n; i++)
+//        cout << weights[i] << endl;
 
-    /*3 使用线性加权矩阵求得各节点的负载评价分*/
+    /*3 获取各项资源的指标值*/
+    double R_cpu,R_mem,R_net,R_disk;
+
+    /*R_cpu*/
+    R_cpu = calCPUInfo();
+    /*R_mem*/
+    R_mem = calMemInfo();
+    /*R_net*/
+    R_net = calNetworkInfo();
+    /*R_disk*/
+    R_disk = calDiskInfo();
+
+    /*4 使用线性加权矩阵求得各节点的负载评价分*/
     /*各项指标权重*/
     double w1 = weights[0],w2 = weights[1],w3 = weights[2],w4 = weights[3];
     /*各项指标值*/
-    double R_cpu,R_mem,R_net,R_disk;
-    R_cpu = 0.7, R_mem = 0.6, R_net = 0.7, R_disk = 0.8;
+    // double R_cpu,R_mem,R_net,R_disk;
     /*计算节点总负载*/
     double load_score = w1 * R_cpu + w2 * R_mem + w3 * R_net + w4 * R_disk;
     cout << "total load_score = " << load_score << endl;
