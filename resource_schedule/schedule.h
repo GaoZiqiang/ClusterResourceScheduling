@@ -14,6 +14,9 @@ Description:进行资源调度
  *
  * */
 #include <vector>
+#include <unordered_map>
+
+using namespace std;
 
 /*负载均衡算法*/
 // 应该叫资源调度算法比较合适
@@ -34,6 +37,8 @@ public:
     /*Hash法*/
     int Hash(vector<int> jobList, vector<int> serverList);
 
+    /*加权最小连接数法*/
+    int weightedLeastConnection(unordered_map<int,unordered_map<int,double>> node_job_load_map);
 
     /*还有其他的一些负载均衡算法*/
 };
