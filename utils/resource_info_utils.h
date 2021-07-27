@@ -392,9 +392,7 @@ double calNetworkInfo() {
 
     long long *itemResults1;
     itemResults1 = getNetworkOccupy();
-    long long inSize1 = itemResults1[0];
-    long long outSize1 = itemResults1[1];
-
+    long long inSize1 = itemResults1[0], outSize1 = itemResults1[1];
 
     long long sleep_time = 1000000;// 延迟时间：1000毫秒
     usleep(sleep_time);
@@ -404,8 +402,7 @@ double calNetworkInfo() {
     long long *itemResults2;
     itemResults2 = getNetworkOccupy();
 
-    long long inSize2 = itemResults2[0];
-    long long outSize2 = itemResults2[1];
+    long long inSize2 = itemResults2[0], outSize2 = itemResults2[1];
 
     /*时间单位换算成秒*/
     double interval = (double)(endTime - startTime) / CLOCKS_PER_SEC;// endTime - startTime为滴答数 CLOCKS_PER_SEC = 1000000
