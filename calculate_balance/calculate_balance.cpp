@@ -67,8 +67,10 @@ double calculateTotalBalance::calculateTotalLoad() {
     /*各项指标值*/
     // double R_cpu,R_mem,R_net,R_disk;
     /*计算节点总负载*/
-    double load_score = w1 * R_cpu + w2 * R_mem + w3 * R_net + w4 * R_disk;
-    cout << "total load_score = " << load_score << endl;
+    double free_score = w1 * R_cpu + w2 * R_mem + w3 * R_net + w4 * R_disk;
+    // cout << "total free_score = " << free_score << endl;
+    double node_load = 1.0 - free_score;
+    cout << "node_load = " << node_load << endl;
 
-    return load_score;
+    return node_load;
 };
