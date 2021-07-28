@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include "resource_info_utils.h"
 
 using namespace std;
 
