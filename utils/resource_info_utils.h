@@ -4,8 +4,8 @@ Author:gaoziqianghi@163.com
 Date:2021-07-20
 Description:计算各资源的使用、空闲情况
 **************************************************/
-#ifndef RESOURCE_H_
-#define RESOURCE_H_
+#ifndef RESOURCE_INFO_UTILS_H
+#define RESOURCE_INFO_UTILS_H
 
 #include <sys/statfs.h>
 #include <mntent.h>
