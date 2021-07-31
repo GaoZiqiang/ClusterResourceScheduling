@@ -336,6 +336,7 @@ static inline void view_curses(struct xxxid_stats_arr *cs,struct xxxid_stats_arr
 
 	// 计算total_read
 	calc_total(cs,&total_read,&total_write);
+	printf("total_read:%s ",total_read);
 	// 计算current_read
 	calc_a_total(act,&total_a_read,&total_a_write,time_s);
 

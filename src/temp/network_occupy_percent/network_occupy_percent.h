@@ -1,9 +1,13 @@
-#include<stdlib.h>
-#include<stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
+#include <time.h>
 
 #define BUFFER_SIZE 256
 
-long long* calNetworkInfo() {
+long long* getNetworkOccupy() {
     FILE *stream;
     char buffer[BUFFER_SIZE];//缓冲区大小
     char *line_return;//记录每次返回值（行）
@@ -69,4 +73,46 @@ long long* calNetworkInfo() {
     printf("itemTransmits:%lld\n",itemTransmits);
 
     return itemResults;
+}
+
+void calNetworkInfo() {
+    // 网络带宽,Mbps
+    static float totalBandWidth = 1000;
+
+    /*第一次采集流量数据*/
+    float startTime = clock();
+
+
+    long long *itemResults1;
+    itemResults1 = getNetworkOccupy();
+    long long inSize1 = itemResults1[0];
+    printf("inSize1:%lld\n",inSize1);
+    long long outSize1 = itemResults1[1];
+    printf("outSize1:%lld\n",outSize1);
+
+
+    long long sleep_time = 1000;
+    usleep(sleep_time);
+
+    /*第二次采集流量数据*/
+    long endTime = clock();
+    long long *itemResults2;
+    itemResults2 = getNetworkOccupy();
+    long long inSize2 = itemResults1[0];
+    printf("inSize2:%lld\n",inSize2);
+    long long outSize2 = itemResults1[1];
+    printf("outSize2:%lld\n",outSize2);
+
+    float interval = (float)(endTime - startTime)/1000;
+    printf("interval:%f\n",interval);
+    float sizes = (float)(inSize2 - inSize1 + outSize2 - outSize1);
+    printf("sizes:%f\n",sizes);
+    float curRate = (float)((long long)(inSize2 - inSize1 + outSize2 - outSize1)*8/(1000000*interval));
+
+    float netUsage = curRate / totalBandWidth;
+
+    printf("netUsage:%f",netUsage);
+//    float totalTime = endTime - startTime;
+
+
 }
