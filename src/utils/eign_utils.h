@@ -92,7 +92,7 @@ double* AHP(int n,double *p,double *RI) {
     /*求判断矩阵的特征根及特征向量*/
     q=eigen(p,n);    //求准则层判断矩阵的特征根及特征向量
     /*A用来暂存特征值和特征向量，q用来进行一致性判断*/
-    A=q;
+    A=q;// 要及时删除/释放q
 
     /*一致性检验*/
     CI=(q[n]-n)/(n-1);
@@ -119,6 +119,8 @@ double* AHP(int n,double *p,double *RI) {
         indicator_weights[i] = A[i];
     }
     cout << endl;
+    // 及时释放A和q
+    delete A, q;
 
     /*返回各指标的权重值*/
     return indicator_weights;// 返回的其实是数组的首指针

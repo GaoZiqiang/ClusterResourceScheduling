@@ -88,6 +88,8 @@ double calculateTotalBalance::calculateTotalLoad() {
 //    thread thread_ahp(AHP,n,p,RI);
 //    thread_ahp.join();
     double w1 = weights[0],w2 = weights[1],w3 = weights[2],w4 = weights[3];
+    // weights用完后要及时释放--本质是释放指针所指向的内存空间，而不是删除指针本身
+    delete [] weights;
     /*各项指标值*/
     // double R_cpu,R_mem,R_net,R_disk;
     /*计算节点总负载*/
