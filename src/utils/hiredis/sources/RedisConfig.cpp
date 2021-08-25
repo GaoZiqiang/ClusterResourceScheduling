@@ -1,4 +1,4 @@
-#include "../Headers/RedisConfig.h"
+#include "../headers/RedisConfig.h"
 #include <sstream>
 
 RedisConfig::RedisConfig()

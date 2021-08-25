@@ -1,11 +1,11 @@
 // 注意编译命令：
-// g++ main.cpp Headers/* Sources/* -o main -L/usr/local/lib/ -lhiredis
+// g++ main.cpp headers/* sources/* -o main -L/usr/local/lib/ -lhiredis
 // 或者
-// g++ main.cpp Headers/* Sources/* -o main -L/usr/include/ -lhiredis
+// g++ main.cpp headers/* sources/* -o main -L/usr/include/ -lhiredis
 
 #include <iostream>
 #include <vector>
-#include "Headers/RedisTools.h"
+#include "headers/RedisTools.h"
 #include "hiredis/hiredis.h"
 
 using namespace std;
