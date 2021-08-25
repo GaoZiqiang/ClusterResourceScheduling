@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/TestRedis.dir/main.cpp.o CMakeFiles/TestRedis.dir/Sources/RedisConfig.cpp.o CMakeFiles/TestRedis.dir/Sources/RedisTools.cpp.o  -o TestRedis 
