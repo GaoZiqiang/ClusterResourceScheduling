@@ -27,5 +27,19 @@ int main()
         cout<<vecResult[i]<<" ";
     }
 
+    // 测试hash
+    string field1 = "load", field2 = "job_num";
+    redis.setHash("nodes:4",field1,"0.77",field2,"2");
+    redis.setHash("nodes:5",field1,"0.01",field2,"0");
+
+    unordered_map<int,unordered_map<double, int>> hashResult = redis.getHash("nodes:5");
+    printf("hashResult.begin()->first: %d\n",hashResult.begin()->first);
+    //    printf("hashResult.size: %d\n",hashResult.size());
+//    printf("hashResult[0]: %s\n",hashResult[0].c_str());
+//    for(int i=0;i<hashResult.size();i++)
+//    {
+//        cout<< hashResult[i] <<" ";
+//    }
+
     return 0;
 }

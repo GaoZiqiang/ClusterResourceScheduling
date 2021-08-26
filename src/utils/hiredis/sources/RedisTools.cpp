@@ -4,6 +4,9 @@
 #include <string.h>
 #include <sstream>
 #include "hiredis/hiredis.h"
+#include <unordered_map>
+
+using namespace std;
 
 RedisTool::RedisTool()
 {
@@ -52,7 +55,7 @@ int RedisTool::setString(string key, string value)
         return -1;
     }
     redisReply *reply;
-    reply = (redisReply *)redisCommand(m_redis,"SET %s %s", key.c_str(), value.c_str());//执行写入命令
+    reply = (redisReply *)redisCommand(m_redis,     "SET %s %s", key.c_str(), value.c_str());//执行写入命令
     cout<<"set string type = "<<reply->type<<endl;//获取响应的枚举类型
     int result = 0;
     if(reply == NULL)
@@ -194,5 +197,93 @@ vector<int> RedisTool::getList(string key)
 
     cout<<"result size:"<<result.size()<<endl;
     return result;
+
+}
+
+//向数据库写入hash类型数据
+int RedisTool::setHash(string key, string field1, string value1, string field2, string value2)
+{
+    if(m_redis == NULL || m_redis->err)//int err; /* Error flags, 错误标识，0表示无错误 */
+    {
+        cout << "Redis init Error !!!" << endl;
+        init();
+        return -1;
+    }
+    redisReply *reply;
+    reply = (redisReply *)redisCommand(m_redis,"HMSET %s %s %s %s %s", key.c_str(), field1.c_str(), value1.c_str(), field2.c_str(), value2.c_str());//执行写入命令
+    cout<<"set string type = "<<reply->type<<endl;//获取响应的枚举类型
+    int result = 0;
+    if(reply == NULL)
+    {
+        redisFree(m_redis);
+        m_redis = NULL;
+        result = -1;
+        cout << "set string fail : reply->str = NULL " << endl;
+        //pthread_spin_unlock(&m_redis_flock);
+        return -1;
+    }
+    else if(strcmp(reply->str, "OK") == 0)//根据不同的响应类型进行判断获取成功与否
+    {
+        result = 1;
+    }
+    else
+    {
+        result = -1;
+        cout << "set string fail :" << reply->str << endl;
+    }
+    freeReplyObject(reply);//释放响应信息
+
+    return result;
+}
+
+//从数据库读出hash类型数据
+unordered_map<int,unordered_map<double, int>> RedisTool::getHash(string key)
+{
+
+    if(m_redis == NULL || m_redis->err)
+    {
+        cout << "Redis init Error !!!" << endl;
+        init();
+        return unordered_map<int,unordered_map<double, int>>{};//返回空的向量
+    }
+
+    redisReply *reply;
+    reply = (redisReply*)redisCommand(m_redis,"HLEN %s", key.c_str());
+    int valueSize = reply->integer;
+    cout<<"Hash size is :"<<reply->integer<<endl;
+
+    reply = (redisReply*)redisCommand(m_redis,"HGETALL %s", key.c_str());
+////    reply = (redisReply*)redisCommand(m_redis,"LRANGE %s %d %d", key.c_str(),0,valueSize-1);
+    cout<<"get hash type = "<<reply->type<<endl;
+    cout<<"get hash size = "<<reply->elements<<endl;//对于数组类型可以用elements元素获取数组长度
+    int ele_num = reply->elements;
+//
+    redisReply** replyVector = reply->element;//获取数组指针
+    vector<string> result;
+
+    for(int i=0;i<ele_num;i++)
+    {
+        string temp =(*replyVector)->str;//遍历redisReply*数组,存入vector向量
+        //int a =atoi(temp.c_str());
+        //string a = temp.c_str();
+        result.push_back(temp);
+        cout << "temp:" << temp << endl;
+        replyVector++;
+    }
+
+    printf("printf--reslut[0]: %s\n",result[0].c_str());
+    cout << "result[0]: " << result[0] << endl;
+
+    // result封装成一个map--unorderedmap
+    // node_info--{node_id,{load,job_num}}
+    unordered_map<int,unordered_map<double, int>> node_info;
+    int node_id = 5;
+    node_info = {{node_id,{{atof(result[1].c_str()),atoi(result[3].c_str())}}}};
+
+
+//
+//    cout<<"result size:"<<result.size()<<endl;
+    //vector<string> result = {"hello"};
+    return node_info;
 
 }
