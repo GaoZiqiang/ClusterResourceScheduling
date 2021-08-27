@@ -201,7 +201,7 @@ vector<int> RedisTool::getList(string key)
 }
 
 //向数据库写入hash类型数据
-int RedisTool::setHash(string key, string field1, string value1, string field2, string value2)
+int RedisTool::setHash(std::vector<std::pair<string, double>> node_info)
 {
     if(m_redis == NULL || m_redis->err)//int err; /* Error flags, 错误标识，0表示无错误 */
     {
@@ -209,8 +209,33 @@ int RedisTool::setHash(string key, string field1, string value1, string field2, 
         init();
         return -1;
     }
+
+
+    // 代码太丑了！！！
+    // node_id
+    string key_node_id = node_info[0].first;// node_id
+    double value_node_id = node_info[0].second;// node load
+
+    // resource keys
+    string key_load = node_info[1].first, key_cpu = node_info[2].first, key_mem = node_info[3].first,
+            key_disk = node_info[4].first, key_net = node_info[5].first;
+    // values
+    double value_load = node_info[1].second, value_cpu = node_info[2].second, value_mem = node_info[3].second,
+            value_disk = node_info[4].second, value_net = node_info[5].second;
+
+    // node_id转int-->string-->拼接成node_id_info
+    int node_id_ = int(value_node_id);
+    string node_id = "node_" + to_string(node_id_) + "_info";
+//    redis.setHash(to_string(node_id),key_load,value_load, key_cpu,value_cpu, key_mem,value_mem,
+//                  key_disk,value_disk, key_net,value_net);
+
+
+
+
     redisReply *reply;
-    reply = (redisReply *)redisCommand(m_redis,"HMSET %s %s %s %s %s", key.c_str(), field1.c_str(), value1.c_str(), field2.c_str(), value2.c_str());//执行写入命令
+    reply = (redisReply *)redisCommand(m_redis,"HMSET %s %s %s %s %s %s %s %s %s %s %s", node_id.c_str(), key_load.c_str(), to_string(value_load).c_str(),
+                                       key_cpu.c_str(), to_string(value_cpu).c_str(),key_mem.c_str(), to_string(value_mem).c_str(),key_disk.c_str(), to_string(value_disk).c_str(),
+                                       key_net.c_str(), to_string(value_net).c_str());//执行写入命令
     cout<<"set string type = "<<reply->type<<endl;//获取响应的枚举类型
     int result = 0;
     if(reply == NULL)
