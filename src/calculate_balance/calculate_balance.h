@@ -7,6 +7,11 @@ Description:计算节点的综合负载
 
 #ifndef CALCULATE_BALANCE_H_
 #define CALCULATE_BALANCE_H_
+#include <vector>
+#include <string>
+#include <utility>
+
+using namespace std;
 
 #pragma once
 
@@ -53,7 +58,7 @@ public:
     Function:calculateTotalLoad
     Description:计算节点的综合负载
     *************************************************/
-    double calculateTotalLoad();
+    vector<pair<string, double>> calculateTotalLoad();
 
 
 
