@@ -1,4 +1,5 @@
 #include "../headers/redis_tools.h"
+#include "../../split_str.h"
 //#include "../headers/RedisConfig.h"
 #include <stdio.h>
 #include <string.h>
@@ -257,18 +258,22 @@ int RedisTool::setHash(std::vector<std::pair<string, double>> node_info)
 }
 
 //从数据库读出hash类型数据
-unordered_map<int,unordered_map<int, double>> RedisTool::getHash(string key)
+pair<int,pair<int, double>> RedisTool::getHash(string key)
 {
     if(m_redis == NULL || m_redis->err)
     {
         cout << "Redis init Error !!!" << endl;
         init();
-        return unordered_map<int,unordered_map<int, double>>{};//返回空的向量
+        return pair<int,pair<int, double>>();//返回空的向量
     }
 
     redisReply *reply;
     reply = (redisReply*)redisCommand(m_redis,"HLEN %s", key.c_str());
     int valueSize = reply->integer;
+    if (valueSize == 0) {
+        printf("NO key: %s\n",key.c_str());
+        return pair<int,pair<int, double>>();
+    }
     cout<<"Hash size is :"<<reply->integer<<endl;
 
     reply = (redisReply*)redisCommand(m_redis,"HGETALL %s", key.c_str());
@@ -298,14 +303,17 @@ unordered_map<int,unordered_map<int, double>> RedisTool::getHash(string key)
         printf("result[%d]: %s\n",i, result[i].c_str());
 
     // result封装成一个map--unorderedmap
+    // 结果应该封装成一个pair<int,unordered_map<int, double>>--作为map的元素格式
     // node_info--{node_id,{job_num,load}}
-    unordered_map<int,unordered_map<int, double>> node_info;
-    int node_id = 5;
+    pair<int,pair<int, double>> node_info;
+//    int node_id = 5;
+    int node_id = atoi(splitStr(key,'_')[1].c_str());
+    printf("node_id: %d\n",node_id);
     int job_num = atoi(result[5].c_str());
+
     printf("job_num: %d\n",job_num);
-    node_info = {
-            {node_id,{{atoi(result[5].c_str()),atoi(result[0].c_str())}}}
-    };
+    // reslut[0]是负载,result[5]是作业数
+    node_info = make_pair(node_id, make_pair(atoi(result[5].c_str()), atof(result[0].c_str())));
 
     return node_info;
 }

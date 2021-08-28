@@ -20,7 +20,7 @@ public:
     vector<int> getList(string key);
 
     int setHash(std::vector<std::pair<string, double>> node_info);
-    unordered_map<int,unordered_map<int, double>> getHash(string key);
+    pair<int,pair<int, double>> getHash(string key);
 
 private:
     void init();
