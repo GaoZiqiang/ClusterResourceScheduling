@@ -23,22 +23,18 @@ using namespace std;
 // 因为其目的就是为作业选择计算节点
 class loadBalance {
 public:
-    /*负载均衡算法--为计算作业选择计算节点的方法*/
+    /*从数据库读取各计算节点的负载和作业信息*/
+    vector<pair<int,pair<int, double>>> collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list);
 
-    /* 轮询法
+
+
+    /*负载均衡算法--为计算作业选择计算节点的方法*/
+    /* 加权最小连接数法
      * param@jobType：作业的类型 CPU 密集型、内存密集型、I/O 密集型和网络密集型
      * return:selected serverId
      * */
-    int roundRobin(vector<int> jobList, vector<int> serverList);
-
-    /*随机法*/
-    int Random(vector<int> jobList, vector<int> serverList);
-
-    /*Hash法*/
-    int Hash(vector<int> jobList, vector<int> serverList);
-
-    /*加权最小连接数法*/
-    int weightedLeastConnection(unordered_map<int,unordered_map<int,double>> node_job_load_map);
+//    int weightedLeastConnection(unordered_map<int,unordered_map<int,double>> node_job_load_map);
+    int weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos);
 
     /*还有其他的一些负载均衡算法*/
 };
