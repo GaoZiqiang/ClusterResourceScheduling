@@ -1,4 +1,4 @@
-#include "../headers/RedisTools.h"
+#include "../headers/redis_tools.h"
 //#include "../headers/RedisConfig.h"
 #include <stdio.h>
 #include <string.h>
@@ -200,7 +200,7 @@ vector<int> RedisTool::getList(string key)
 
 }
 
-//向数据库写入hash类型数据
+//向数据库写入hash类型数据--输入参数为std::vector<std::pair<string, double>> node_info
 int RedisTool::setHash(std::vector<std::pair<string, double>> node_info)
 {
     if(m_redis == NULL || m_redis->err)//int err; /* Error flags, 错误标识，0表示无错误 */
@@ -210,32 +210,27 @@ int RedisTool::setHash(std::vector<std::pair<string, double>> node_info)
         return -1;
     }
 
-
     // 代码太丑了！！！
     // node_id
     string key_node_id = node_info[0].first;// node_id
     double value_node_id = node_info[0].second;// node load
 
-    // resource keys
+    // 拆解相关field和value值
+    // resource field
     string key_load = node_info[1].first, key_cpu = node_info[2].first, key_mem = node_info[3].first,
-            key_disk = node_info[4].first, key_net = node_info[5].first;
+            key_disk = node_info[4].first, key_net = node_info[5].first, key_job_num = node_info[6].first;
     // values
     double value_load = node_info[1].second, value_cpu = node_info[2].second, value_mem = node_info[3].second,
-            value_disk = node_info[4].second, value_net = node_info[5].second;
+            value_disk = node_info[4].second, value_net = node_info[5].second, value_job_num = node_info[6].second;
 
     // node_id转int-->string-->拼接成node_id_info
     int node_id_ = int(value_node_id);
     string node_id = "node_" + to_string(node_id_) + "_info";
-//    redis.setHash(to_string(node_id),key_load,value_load, key_cpu,value_cpu, key_mem,value_mem,
-//                  key_disk,value_disk, key_net,value_net);
-
-
-
 
     redisReply *reply;
-    reply = (redisReply *)redisCommand(m_redis,"HMSET %s %s %s %s %s %s %s %s %s %s %s", node_id.c_str(), key_load.c_str(), to_string(value_load).c_str(),
+    reply = (redisReply *)redisCommand(m_redis,"HMSET %s %s %s %s %s %s %s %s %s %s %s %s %s", node_id.c_str(), key_load.c_str(), to_string(value_load).c_str(),
                                        key_cpu.c_str(), to_string(value_cpu).c_str(),key_mem.c_str(), to_string(value_mem).c_str(),key_disk.c_str(), to_string(value_disk).c_str(),
-                                       key_net.c_str(), to_string(value_net).c_str());//执行写入命令
+                                       key_net.c_str(), to_string(value_net).c_str(), key_job_num.c_str(), to_string(value_job_num).c_str());//执行写入命令
     cout<<"set string type = "<<reply->type<<endl;//获取响应的枚举类型
     int result = 0;
     if(reply == NULL)
@@ -262,14 +257,13 @@ int RedisTool::setHash(std::vector<std::pair<string, double>> node_info)
 }
 
 //从数据库读出hash类型数据
-unordered_map<int,unordered_map<double, int>> RedisTool::getHash(string key)
+unordered_map<int,unordered_map<int, double>> RedisTool::getHash(string key)
 {
-
     if(m_redis == NULL || m_redis->err)
     {
         cout << "Redis init Error !!!" << endl;
         init();
-        return unordered_map<int,unordered_map<double, int>>{};//返回空的向量
+        return unordered_map<int,unordered_map<int, double>>{};//返回空的向量
     }
 
     redisReply *reply;
@@ -291,24 +285,27 @@ unordered_map<int,unordered_map<double, int>> RedisTool::getHash(string key)
         string temp =(*replyVector)->str;//遍历redisReply*数组,存入vector向量
         //int a =atoi(temp.c_str());
         //string a = temp.c_str();
-        result.push_back(temp);
+
         cout << "temp:" << temp << endl;
+        // i偶数为指标，奇数为指标值
+        if (i % 2 == 1) {
+            result.push_back(temp);
+        }
         replyVector++;
     }
 
-    printf("printf--reslut[0]: %s\n",result[0].c_str());
-    cout << "result[0]: " << result[0] << endl;
+    for (int i = 0; i < result.size(); i ++)
+        printf("result[%d]: %s\n",i, result[i].c_str());
 
     // result封装成一个map--unorderedmap
-    // node_info--{node_id,{load,job_num}}
-    unordered_map<int,unordered_map<double, int>> node_info;
+    // node_info--{node_id,{job_num,load}}
+    unordered_map<int,unordered_map<int, double>> node_info;
     int node_id = 5;
-    node_info = {{node_id,{{atof(result[1].c_str()),atoi(result[3].c_str())}}}};
+    int job_num = atoi(result[5].c_str());
+    printf("job_num: %d\n",job_num);
+    node_info = {
+            {node_id,{{atoi(result[5].c_str()),atoi(result[0].c_str())}}}
+    };
 
-
-//
-//    cout<<"result size:"<<result.size()<<endl;
-    //vector<string> result = {"hello"};
     return node_info;
-
 }

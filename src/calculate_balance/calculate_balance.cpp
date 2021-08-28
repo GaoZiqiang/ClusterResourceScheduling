@@ -1,6 +1,6 @@
 #include "calculate_balance.h"
 #include "../utils/eign_utils.h"
-#include "../utils/resource_info_utils.h"
+//#include "../utils/resource_info_utils.h"
 
 #include <iostream>
 #include <thread>
@@ -20,7 +20,7 @@ calculateTotalBalance::calculateTotalBalance() {
 Function:calculateTotalLoad
 Description:计算节点的综合负载
 
-Input:判断矩阵、矩阵维数、RI对应表。。。
+Input:各资源指标值、指标权重
 Return:节点的综合负载评分
 *************************************************/
 double calculateTotalBalance::calculateTotalLoad() {

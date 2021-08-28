@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "hiredis/hiredis.h"
-#include "RedisConfig.h"
+#include "redis_config.h"
 #include <unordered_map>
 
 using namespace std;
@@ -20,7 +20,7 @@ public:
     vector<int> getList(string key);
 
     int setHash(std::vector<std::pair<string, double>> node_info);
-    unordered_map<int,unordered_map<double, int>> getHash(string key);
+    unordered_map<int,unordered_map<int, double>> getHash(string key);
 
 private:
     void init();
