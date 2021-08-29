@@ -57,8 +57,9 @@ int main() {
     calculateTotalBalance ctd;
     // 程序运行报错--std::bad_alloc
     vector<pair<string, double>> node_info;
-    node_info = ctd.calculateTotalLoad();
-    node_info.swap(node_info);
+//    node_info = ctd.calculateTotalLoad();
+    ctd.calculateTotalLoad();
+//    node_info.swap(node_info);
 //    ctd.calculateTotalLoad();
 //    vector<pair<string, double>>(node_info).swap(node_info);
 
