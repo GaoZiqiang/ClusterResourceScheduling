@@ -34,7 +34,7 @@ public:
      * return:selected serverId
      * */
 //    int weightedLeastConnection(unordered_map<int,unordered_map<int,double>> node_job_load_map);
-    int weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos);
+    vector<int> weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos);
 
     /*还有其他的一些负载均衡算法*/
 };
