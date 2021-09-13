@@ -9,6 +9,8 @@
 #include "calculate_balance/calculate_balance.h"
 #include "resource_schedule/schedule.h"
 #include "remote_procedure_call/receive_nodes_info.h"
+//#include "utils/get_ahp_params.h"
+
 //#include "utils/resource_info_utils.h"
 //#include "utils/eign_utils.h"
 
@@ -40,6 +42,9 @@ void thread02()
 
 
 int main() {
+//    char file_path[] = "../config/ahp_param.txt";
+//    double *params = getAHPParams(file_path);
+//    printf("params[0]: %f\n",params[0]);
 
 //    thread task01(thread01);
 //
@@ -51,21 +56,21 @@ int main() {
 
 
 
-    clock_t start_time = clock();
+//    clock_t start_time = clock();
     /*整体流程测试*/
     /*1 计算slave node从属子节点的节点负载*/
-    calculateTotalBalance ctd;
+//    calculateTotalBalance ctd;
     // 程序运行报错--std::bad_alloc
-    vector<pair<string, double>> node_info;
+//    vector<pair<string, double>> node_info;
 //    node_info = ctd.calculateTotalLoad();
-    ctd.calculateTotalLoad();
+//    ctd.calculateTotalLoad();
 //    node_info.swap(node_info);
 //    ctd.calculateTotalLoad();
 //    vector<pair<string, double>>(node_info).swap(node_info);
 
-    clock_t end_time = clock();
+//    clock_t end_time = clock();
 //
-    cout << "total time: " << (end_time - start_time) << endl;
+//    cout << "total time: " << (end_time - start_time) << endl;
 
 
     /*1 模拟构造输入node_infos*/
@@ -79,18 +84,18 @@ int main() {
 //             << "node load: " << node_infos[i].second.second << endl;
 //    }
 
-//    // 候选节点列表
-//    vector<int> candidte_nodes = {1,2,3,4};
-//    /*3 master node中心节点 根据node_job_load_map，使用加权最小连接数法选择目标节点*/
-//    loadBalance lb;
-//    // 收集子节点的node_load和job_num信息
-//    vector<pair<int, pair<int, double>>> node_infos = lb.collectNodeInfoFromSubNodes(candidte_nodes);
-//    for (int i = 0; i < node_infos.size(); i++) {
-//        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
-//             << "node load: " << node_infos[i].second.second << endl;
-//    }
-//    // 选取目标节点
-//    lb.weightedLeastConnection(node_infos);
+    // 候选节点列表
+    vector<int> candidte_nodes = {1,2,3,4,5,6};
+    /*3 master node中心节点 根据node_job_load_map，使用加权最小连接数法选择目标节点*/
+    loadBalance lb;
+    // 收集子节点的node_load和job_num信息
+    vector<pair<int, pair<int, double>>> node_infos = lb.collectNodeInfoFromSubNodes(candidte_nodes);
+    for (int i = 0; i < node_infos.size(); i++) {
+        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
+             << "node load: " << node_infos[i].second.second << endl;
+    }
+    // 选取目标节点
+    lb.weightedLeastConnection(node_infos);
 
 
 
@@ -126,3 +131,4 @@ int main() {
 
     return 0;
 }
+
