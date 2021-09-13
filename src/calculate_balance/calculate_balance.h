@@ -18,9 +18,9 @@ using namespace std;
 /*计算各节点的综合负载*/
 class calculateTotalBalance {
 private:
-    int resource_num;
-    double *judge_matrix = new double[resource_num*resource_num];// 定义动态数组
-    double RI[11];
+    // int resource_num;
+    // double *judge_matrix = new double[resource_num*resource_num];// 定义动态数组
+    // double RI[11];
 
 public:
     /*构造函数*/
