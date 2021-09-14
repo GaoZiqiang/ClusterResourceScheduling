@@ -48,13 +48,13 @@ Description:从数据库读取各计算节点的负载和作业信息
 Input@fileName:候选的node id列表--candidate_nodes_list--vector<int>
 Return@itemResults:unordered_map<int,unordered_map<int, double>> node_infos;
 *************************************************/
-vector<pair<int,pair<int, double>>> loadBalance::collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list) {
+NODES_VECTOR_RS resourceSchedule::collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list) {
     // RedisTool 对象
     RedisTool redis_tool;
     // 封装HGETALL命令的查询key
 //    vector<string> node_idx;
     // 存放候选节点的job_num和node_load信息
-    vector<pair<int,pair<int, double>>> node_infos;
+//    NODES_VECTOR_RS node_infos;
     for (int i = 0; i < candidate_nodes_list.size(); i++) {
         // 拼接key--node_id_info
         string node_id = "node_" + to_string(candidate_nodes_list[i]) + "_info";// node id从1开始
@@ -73,7 +73,7 @@ Description:加权最小连接数法选取/计算目标节点
 Input@fileName:node_id,job_num,node_load
 Return@itemResults:目标节点id
 *************************************************/
-vector<int> loadBalance::weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos) {
+vector<int> resourceSchedule::weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos) {
     /*1 进行vector预处理--对输入参数进行格式转换*/
     // 现在不需要对输入参数进行格式转换了
     /*2 根据各节点的作业数进行排序*/
@@ -135,7 +135,7 @@ vector<int> loadBalance::weightedLeastConnection(vector<pair<int,pair<int, doubl
     }
 
     // 返回目标节点
-    cout << "选出的目标节点id为: " << final_node_id << endl;
+    cout << "最优目标节点id为: " << final_node_id << endl;
 //    return final_node_id;
 
     // 返回目标节点列表
@@ -144,17 +144,16 @@ vector<int> loadBalance::weightedLeastConnection(vector<pair<int,pair<int, doubl
     sort(sorted_vec2.begin(), sorted_vec2.end(), cmpByLoad);
 
     vector<PAIR> merged_vec = mergeVec(sorted_vec0, sorted_vec1, sorted_vec2);
-    for (int i = 0; i < merged_vec.size(); i++) {
-        printf("merged_vec[0].node_id: %d\n", merged_vec[i].first);
-    }
+//    for (int i = 0; i < merged_vec.size(); i++) {
+//        printf("merged_vec[0].node_id: %d\n", merged_vec[i].first);
+//    }
 
     // 目标节点列表
-    vector<int> goal_node_idx;
     for (int i = 0; i < merged_vec.size(); i++)
         goal_node_idx.push_back(merged_vec[i].first);
 
     for (int i = 0; i < goal_node_idx.size(); i++)
-        printf("goal node list: %d\n",goal_node_idx[i]);
+        printf("目标节点列表-%d: %d\n", i + 1, goal_node_idx[i]);
 
     return goal_node_idx;
 }

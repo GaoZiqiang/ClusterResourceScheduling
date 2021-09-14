@@ -35,8 +35,8 @@ int main()
             make_pair("node_id",2), make_pair("node_load",0.88),make_pair("cpu",0.69), make_pair("mem",0.88),
             make_pair("disk",0.56), make_pair("net",0.88), make_pair("job_num",1)
     };
-    cout << "node_id_info:\n" << node_info[0].first << ": " << node_info[0].second << "\n" <<
-         node_info[1].first << ": " << node_info[1].second << endl;
+//    cout << "node_id_info:\n" << node_info[0].first << ": " << node_info[0].second << "\n" <<
+//         node_info[1].first << ": " << node_info[1].second << endl;
     // 遍历输出
     for (int i = 0; i < node_info.size(); i++)
         cout << node_info[i].first << ": " << node_info[i].second << " ";
@@ -55,11 +55,23 @@ int main()
             make_pair("node_id",4), make_pair("node_load",0.44),make_pair("cpu",0.69), make_pair("mem",0.88),
             make_pair("disk",0.56), make_pair("net",0.88), make_pair("job_num",0)
     };
+
+    vector<pair<string, double>> node_info5 = {
+            make_pair("node_id",5), make_pair("node_load",0.80),make_pair("cpu",0.69), make_pair("mem",0.88),
+            make_pair("disk",0.56), make_pair("net",0.88), make_pair("job_num",1)
+    };
+
+    vector<pair<string, double>> node_info6 = {
+            make_pair("node_id",6), make_pair("node_load",0.96),make_pair("cpu",0.69), make_pair("mem",0.88),
+            make_pair("disk",0.56), make_pair("net",0.88), make_pair("job_num",2)
+    };
 //    string field1 = "load", field2 = "job_num";
     redis.setHash(node_info);
     redis.setHash(node_info2);
     redis.setHash(node_info3);
     redis.setHash(node_info4);
+    redis.setHash(node_info5);
+    redis.setHash(node_info6);
 
 //    redis.setHash("nodes:5",field1,"0.01",field2,"0");
 //

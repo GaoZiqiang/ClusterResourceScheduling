@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>          // file I/O support
 #include <cstdlib>          // support for exit()
+#include <string.h>
 
-double * getAHPParams(char * file_path)
+double * resourceParamsInit(char * file_path)
 {
     using namespace std;
     ifstream inFile;        // object for handling file input
@@ -10,8 +11,7 @@ double * getAHPParams(char * file_path)
     inFile.open(file_path);  // associate inFile with a file
     if (!inFile.is_open())  // failed to open file
     {
-        cout << "Could not open the file " << file_path << endl;
-        cout << "Program terminating.\n";
+        printf("Cannot open %s:%s!\n", file_path, strerror(errno));
         exit(1);
     }
     double value;

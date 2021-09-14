@@ -18,50 +18,22 @@ Description:进行资源调度
 
 using namespace std;
 
-/*负载均衡算法*/
-// 应该叫资源调度算法比较合适
-// 因为其目的就是为作业选择计算节点
-class loadBalance {
+typedef vector<pair<int,pair<int, double>>> NODES_VECTOR_RS;
+
+class resourceSchedule {
+private:
+    // 从数据库中读取的节点信息
+    NODES_VECTOR_RS node_infos;
+    // 候选目标节点列表
+    vector<int> goal_node_idx;
+
 public:
     /*从数据库读取各计算节点的负载和作业信息*/
-    vector<pair<int,pair<int, double>>> collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list);
+    NODES_VECTOR_RS collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list);
 
-
-
-    /*负载均衡算法--为计算作业选择计算节点的方法*/
     /* 加权最小连接数法
      * param@jobType：作业的类型 CPU 密集型、内存密集型、I/O 密集型和网络密集型
      * return:selected serverId
      * */
-//    int weightedLeastConnection(unordered_map<int,unordered_map<int,double>> node_job_load_map);
     vector<int> weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos);
-
-    /*还有其他的一些负载均衡算法*/
-};
-
-/*根据作业类型和节点的负载情况，为计算作业选择合适的计算节点*/
-class resourceSchedule {
-public:
-
-    /* 两个预备工作
-     * 1 计算作业类型
-     * 2 获取节点的综合负载情况(综合负载评价值)
-     * */
-
-    /* 计算作业类型
-     * 计算细节在calculate_balance层
-     * */
-    int getJobType();
-
-    /* 获取节点的综合负载评价值--传递
-     * 计算细节在calculate_balance层
-     * */
-    int getServerBalance();
-
-    /*根据作业类型和节点的负载情况，为计算作业选择合适的计算节点
-     *
-     * param@loadName:选择要使用的负载均衡算法
-     * */
-    void selectNodeForJob(int jobId, char * const jobName, char loadName);
-
 };
