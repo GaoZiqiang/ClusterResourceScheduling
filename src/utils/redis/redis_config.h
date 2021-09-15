@@ -8,7 +8,6 @@ public:
     RedisConfig();
     std::string getRedisIP();//获取ip
     int getRedisPort();//获取端口号
-
 };
 
 #endif

@@ -1,5 +1,5 @@
-#include "../headers/redis_tools.h"
-#include "../../split_str.h"
+#include "redis_tools.h"
+#include "../split_str.h"
 //#include "../headers/RedisConfig.h"
 #include <stdio.h>
 #include <string.h>

@@ -13,6 +13,6 @@ find_Package(Threads)
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
 
 # 对hiredis本地依赖的注入
-#find_Package(hiredis)
-#target_link_libraries(${PROJECT_NAME} /usr/include/hiredis)
+#find_Package(redis)
+#target_link_libraries(${PROJECT_NAME} /usr/include/redis)
 #add_executable(ResourceSchedule utils/test_main.cpp)
