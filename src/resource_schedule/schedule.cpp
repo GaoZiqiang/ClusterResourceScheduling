@@ -1,6 +1,7 @@
 #include "schedule.h"
-#include "../utils/hiredis/headers/redis_tools.h"
+#include "../utils/redis/redis_tools.h"
 #include "hiredis/hiredis.h"// from /usr/include/hiredis或者/usr/local/lib
+#include "../utils/mysql/mysql_tools.h"
 
 #include <unordered_map>
 #include <algorithm>
@@ -42,25 +43,71 @@ vector<PAIR> mergeVec(const vector<PAIR>& vec1, const vector<PAIR>& vec2, const 
 
 
 /*************************************************
-Function:collectNodeInfoFromSubNodes
+Function:collectNodeInfoByRedis
 Description:从数据库读取各计算节点的负载和作业信息
 
 Input@fileName:候选的node id列表--candidate_nodes_list--vector<int>
 Return@itemResults:unordered_map<int,unordered_map<int, double>> node_infos;
 *************************************************/
-NODES_VECTOR_RS resourceSchedule::collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list) {
+NODES_VECTOR_RS resourceSchedule::collectNodeInfoByRedis(vector<int> &candidate_nodes_list) {
     // RedisTool 对象
     RedisTool redis_tool;
-    // 封装HGETALL命令的查询key
-//    vector<string> node_idx;
-    // 存放候选节点的job_num和node_load信息
-//    NODES_VECTOR_RS node_infos;
+
     for (int i = 0; i < candidate_nodes_list.size(); i++) {
         // 拼接key--node_id_info
         string node_id = "node_" + to_string(candidate_nodes_list[i]) + "_info";// node id从1开始
-
-//        redis_tool.getHash(node_id);
         node_infos.push_back(redis_tool.getHash(node_id));
+    }
+
+    return node_infos;
+}
+
+
+/*从可用节点库中选取*/
+NODES_VECTOR_RS resourceSchedule::collectNodeInfoFromAvailNodesByMysql(std::string table) {
+    // 从mysql中查询相应记录的job_num和node_load
+    MysqlTools mysql_tools;
+    //std::string table = "node_info";// 数据表--应该作为形参
+    std::string sql = "select * from " + table + " where isfault = 0";// node_info为可用节点表
+    printf("sql: %s\n",sql.c_str());
+    pair<int, vector<char **>> result = mysql_tools.select(sql);
+
+    int field_count = result.first;// 每条记录的字段个数
+    vector<char **> rows = result.second;// 所有查询到的记录
+    for (int i = 0; i < rows.size(); i++) {
+        printf("node_id: %d, job_num: %d, node_load: %f\n", atoi(rows[i][0]),
+               atoi(rows[i][1]),atof(rows[i][2]));
+
+        NODE_PAIR node_info = make_pair(atoi(rows[i][0]), make_pair(atoi(rows[i][1]), atof(rows[i][2])));
+        // 存入node_infos
+        node_infos.push_back(node_info);
+    }
+
+    return node_infos;
+
+}
+
+
+/*从候选节点队列中选取*/
+NODES_VECTOR_RS resourceSchedule::collectNodeInfoFromCandNodesByMysql(std::string table, vector<int> &candidate_nodes_list) {
+    MysqlTools mysql_tools;
+
+    for (int i = 0; i < candidate_nodes_list.size(); i++) {
+        std::string sql = "select * from " + table + " where node_id = " + to_string(candidate_nodes_list[i]);
+        printf("sql: %s\n",sql.c_str());
+        pair<int, vector<char **>> result = mysql_tools.select(sql);
+
+        int field_count = result.first;// 每条记录的字段个数
+        vector<char **> rows = result.second;// 所有查询到的记录
+        // 每次查询只有一条结果--rows[0]
+        for (int i = 0; i < rows.size(); i++) {
+            printf("node_id: %d, job_num: %d, node_load: %f\n", atoi(rows[i][0]),
+                   atoi(rows[i][1]), atof(rows[i][2]));
+
+            NODE_PAIR node_info = make_pair(atoi(rows[i][0]), make_pair(atoi(rows[i][1]), atof(rows[i][2])));
+            // 存入node_infos
+            node_infos.push_back(node_info);
+        }
     }
 
     return node_infos;
@@ -74,12 +121,10 @@ Input@fileName:node_id,job_num,node_load
 Return@itemResults:目标节点id
 *************************************************/
 vector<int> resourceSchedule::weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos) {
-    /*1 进行vector预处理--对输入参数进行格式转换*/
-    // 现在不需要对输入参数进行格式转换了
-    /*2 根据各节点的作业数进行排序*/
+    /*1 根据各节点的作业数进行排序*/
     sort(node_infos.begin(), node_infos.end(), cmpByJob);  // vector根据cmp的规则进行排序
 
-    /*3 再按照节点负载对作业数为0和1的节点分别进行排序，分别得到负载最低的节点*/
+    /*2 按照节点负载对作业数为0和1的节点分别进行排序，分别得到负载最低的节点*/
     /*分别用来暂存经过排序的job_num为0和1的节点序列*/
     vector<PAIR> sorted_vec0, sorted_vec1, sorted_vec2;  //
     /*作业数为0和1的节点最大负载*/
@@ -118,7 +163,7 @@ vector<int> resourceSchedule::weightedLeastConnection(vector<pair<int,pair<int, 
 
     }
 
-    /*4 比较作业数为0和1的节点的负载情况，选出最终节点*/
+    /*3 比较作业数为0和1的节点的负载情况，选出最终节点*/
     int final_node_id = -1;
 
     if (min_load_job_0 > 0 && min_load_job_0 < 10.0) {// 若作业数为0的节点不存在（即max_load_job0 < 0），则从作业数为1的节点中选择
@@ -144,16 +189,13 @@ vector<int> resourceSchedule::weightedLeastConnection(vector<pair<int,pair<int, 
     sort(sorted_vec2.begin(), sorted_vec2.end(), cmpByLoad);
 
     vector<PAIR> merged_vec = mergeVec(sorted_vec0, sorted_vec1, sorted_vec2);
-//    for (int i = 0; i < merged_vec.size(); i++) {
-//        printf("merged_vec[0].node_id: %d\n", merged_vec[i].first);
-//    }
-
     // 目标节点列表
     for (int i = 0; i < merged_vec.size(); i++)
         goal_node_idx.push_back(merged_vec[i].first);
 
+    printf("------ 目标节点列表 ------\n");
     for (int i = 0; i < goal_node_idx.size(); i++)
-        printf("目标节点列表-%d: %d\n", i + 1, goal_node_idx[i]);
+        printf("目标节点-%d: %d\n", i + 1, goal_node_idx[i]);
 
     return goal_node_idx;
 }

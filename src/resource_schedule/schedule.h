@@ -19,6 +19,7 @@ Description:进行资源调度
 using namespace std;
 
 typedef vector<pair<int,pair<int, double>>> NODES_VECTOR_RS;
+typedef pair<int,pair<int, double>> NODE_PAIR;
 
 class resourceSchedule {
 private:
@@ -29,11 +30,14 @@ private:
 
 public:
     /*从数据库读取各计算节点的负载和作业信息*/
-    NODES_VECTOR_RS collectNodeInfoFromSubNodes(vector<int> &candidate_nodes_list);
+    /*从redis中读取*/
+    NODES_VECTOR_RS collectNodeInfoByRedis(vector<int> &candidate_nodes_list);
+    /*从mysql中读取*/
+    // 从可用节点库中选取
+    NODES_VECTOR_RS collectNodeInfoFromAvailNodesByMysql(std::string table);
+    // 从候选节点列表中选取
+    NODES_VECTOR_RS collectNodeInfoFromCandNodesByMysql(std::string table, vector<int> &candidate_nodes_list);
 
-    /* 加权最小连接数法
-     * param@jobType：作业的类型 CPU 密集型、内存密集型、I/O 密集型和网络密集型
-     * return:selected serverId
-     * */
+    /*选取目标节点--加权最小连接数法*/
     vector<int> weightedLeastConnection(vector<pair<int,pair<int, double>>> node_infos);
 };
