@@ -5,11 +5,6 @@
 
 using namespace std;
 
-typedef struct result {
-    vector<char **> *rows;
-    int field_count;
-}select_result;
-
 class MysqlTools {
 private:
     void init();
