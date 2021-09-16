@@ -22,15 +22,15 @@ typedef pair<int, pair<int,double>> PAIR;
 int main() {
 
     /*mysql数据库插入*/
-    MysqlTools mysql_tools;
-    char sql[200];
-    int node_id = 8, job_num = 0;
-    double total_load = 0.16, cpu = 0.21, mem = 0.21, disk = 0.09, net = 0.01;
-    sprintf(sql,"insert into node_info (node_id,job_num,total_load,cpu,mem,disk,net) values(%s,%s,%s,%s,%s,%s,%s);",
-            to_string(node_id).c_str(),to_string(job_num).c_str(),to_string(total_load).c_str(),to_string(cpu).c_str(),
-            to_string(mem).c_str(),to_string(disk).c_str(),to_string(net).c_str());
-    printf("sql: %s\n",sql);
-    mysql_tools.insert(sql);
+//    MysqlTools mysql_tools;
+//    char sql[200];
+//    int node_id = 8, job_num = 0;
+//    double total_load = 0.16, cpu = 0.21, mem = 0.21, disk = 0.09, net = 0.01;
+//    sprintf(sql,"insert into node_info (node_id,job_num,total_load,cpu,mem,disk,net) values(%s,%s,%s,%s,%s,%s,%s);",
+//            to_string(node_id).c_str(),to_string(job_num).c_str(),to_string(total_load).c_str(),to_string(cpu).c_str(),
+//            to_string(mem).c_str(),to_string(disk).c_str(),to_string(net).c_str());
+//    printf("sql: %s\n",sql);
+//    mysql_tools.insert(sql);
 
     /*选取目标节点测试--可用节点库mysql*/
 //    resourceSchedule rs;
@@ -45,17 +45,17 @@ int main() {
 //    rs.weightedLeastConnection(node_infos);
 
     /*选取目标节点测试--候选节点列表mysql*/
-//    resourceSchedule rs;
-//    // 收集子节点的node_load和job_num信息
-//    std::string table_name = "node_info";
-//    vector<int> candidte_nodes = {1,2,3,5};
-//    NODES_VECTOR_RS node_infos = rs.collectNodeInfoFromCandNodesByMysql(table_name, candidte_nodes);
-//    for (int i = 0; i < node_infos.size(); i++) {
-//        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
-//             << "node load: " << node_infos[i].second.second << endl;
-//    }
-//    // 选取目标节点
-//    rs.weightedLeastConnection(node_infos);
+    resourceSchedule rs;
+    // 收集子节点的node_load和job_num信息
+    std::string table_name = "node_info";
+    vector<int> candidte_nodes = {1,2,3,5};
+    NODES_VECTOR_RS node_infos = rs.collectNodeInfoFromCandNodesByMysql(table_name, candidte_nodes);
+    for (int i = 0; i < node_infos.size(); i++) {
+        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
+             << "node load: " << node_infos[i].second.second << endl;
+    }
+    // 选取目标节点
+    rs.weightedLeastConnection(node_infos);
 
 
 
