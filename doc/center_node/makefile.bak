@@ -1,0 +1,7 @@
+all:server
+
+server:web_serv.cc split_str.h mysql_config.h mysql_config.cpp mysql_tools.h mysql_tools.cpp
+	g++ web_serv.cc split_str.h mysql_config.h mysql_config.cpp mysql_tools.h mysql_tools.cpp -o server -lpthread -lmysqlclient
+
+clean:
+	rm -rf server
