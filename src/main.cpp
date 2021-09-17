@@ -5,12 +5,14 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdio.h>
 
 #include "calculate_load/calculate_load.h"
 #include "resource_schedule/schedule.h"
 #include "remote_procedure_call/receive_nodes_info.h"
 #include "utils/get_ahp_params.h"
 #include "utils/mysql/mysql_tools.h"
+#include "remote_procedure_call/send_to_center.h"
 
 //#include "utils/resource_info_utils.h"
 //#include "utils/eign_utils.h"
@@ -20,6 +22,33 @@ using namespace std;
 typedef pair<int, pair<int,double>> PAIR;
 
 int main() {
+
+    /*测试打开/proc/net/dev配置文件*/
+//    int i =0;
+//    while (1) {
+//        printf("第 %d 次\n", ++i);
+//        FILE *stream;
+//
+//        if ((stream =fopen("/proc/net/dev","r")) == NULL) {
+//            printf("Cannot open /proc/net/dev file!:%s\n",strerror(errno));
+//            return 0;
+//        }
+//        fclose(stream);
+//    }
+
+
+    /*测试--将数据发送到中心节点*/
+    char param_file[] = "../config/ahp_param.txt";
+    double *weights = resourceParamsInit(param_file);
+
+    calculateNodeLoad cnl;
+    string node_info = cnl.calculateTotalLoad(weights);
+    printf("节点负载: %s\n",node_info.c_str());
+
+    char data[200];
+    strcpy(data, node_info.c_str());
+    sendData(data);
+
 
     /*mysql数据库插入*/
 //    MysqlTools mysql_tools;
@@ -45,17 +74,17 @@ int main() {
 //    rs.weightedLeastConnection(node_infos);
 
     /*选取目标节点测试--候选节点列表mysql*/
-    resourceSchedule rs;
-    // 收集子节点的node_load和job_num信息
-    std::string table_name = "node_info";
-    vector<int> candidte_nodes = {1,2,3,5};
-    NODES_VECTOR_RS node_infos = rs.collectNodeInfoFromCandNodesByMysql(table_name, candidte_nodes);
-    for (int i = 0; i < node_infos.size(); i++) {
-        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
-             << "node load: " << node_infos[i].second.second << endl;
-    }
-    // 选取目标节点
-    rs.weightedLeastConnection(node_infos);
+//    resourceSchedule rs;
+//    // 收集子节点的node_load和job_num信息
+//    std::string table_name = "node_info";
+//    vector<int> candidte_nodes = {1,2,3,5};
+//    NODES_VECTOR_RS node_infos = rs.collectNodeInfoFromCandNodesByMysql(table_name, candidte_nodes);
+//    for (int i = 0; i < node_infos.size(); i++) {
+//        cout << "node id: " << node_infos[i].first << " " << "job num: " << node_infos[i].second.first << " "
+//             << "node load: " << node_infos[i].second.second << endl;
+//    }
+//    // 选取目标节点
+//    rs.weightedLeastConnection(node_infos);
 
 
 
@@ -121,8 +150,8 @@ int main() {
 ////        printf("last_time: %d\n",last_time);
 //        if (now_time - last_time >= 10) {
 //            printf("第 %d 次, now_time: %d\n",++i, now_time);
-//            node_info = ctd.calculateTotalLoad(weights);
-//            printf("node_info[0].second: %f\n",node_info[0].second);
+//            ctd.calculateTotalLoad(weights);
+////            printf("node_info[0].second: %f\n",node_info[0].second);
 //            last_time = now_time;
 //        }
 //    }
