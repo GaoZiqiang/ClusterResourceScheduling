@@ -25,7 +25,7 @@ Description:计算节点的综合负载
 Input:各资源指标值、指标权重
 Return:节点的综合负载评分
 *************************************************/
-NODE_VECTOR_CL calculateNodeLoad::calculateTotalLoad(double * weights) {
+string calculateNodeLoad::calculateTotalLoad(double * weights) {
     /*1 获取各项资源的指标值*/
     double R_cpu,R_mem,R_net,R_disk;
 
@@ -64,5 +64,9 @@ NODE_VECTOR_CL calculateNodeLoad::calculateTotalLoad(double * weights) {
     if (node_load > 0.95)
         sendAlarmToCenter(node_id, node_load);
 
-    return node_info;// 然后发送给中心节点
+    string node_info_str = to_string(node_id) + "&" + to_string(node_load) + "&" + to_string(R_cpu)
+            + "&" + to_string(R_mem) + "&" + to_string(R_disk) + "&" + to_string(R_net);
+    printf("node_info_str: %s\n", node_info_str.c_str());
+
+    return node_info_str;// 然后发送给中心节点
 };

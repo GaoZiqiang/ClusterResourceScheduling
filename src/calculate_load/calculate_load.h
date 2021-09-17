@@ -38,6 +38,7 @@ public:
     Function:calculateTotalLoad
     Description:计算节点的综合负载
     *************************************************/
-    NODE_VECTOR_CL calculateTotalLoad(double * weights);
+//    NODE_VECTOR_CL calculateTotalLoad(double * weights);
+    string calculateTotalLoad(double * weights);
 };
 #endif
