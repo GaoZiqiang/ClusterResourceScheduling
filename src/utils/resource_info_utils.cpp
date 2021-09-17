@@ -90,6 +90,7 @@ Return@disk_free_percent:节点的磁盘空闲率
         double disk_free_percent = disk_free / disk_total;
         printf("磁盘空闲率: %f\n", disk_free_percent);
 
+        endmntent(fh);// 释放fh指针
         return disk_free_percent;
     }
 
@@ -300,6 +301,7 @@ Return@itemResults:系统至今（当前）接收/发送字节总数
         itemResults[0] = itemReceives;
         itemResults[1] = itemTransmits;
 
+        fclose(stream);// 释放stream指针
         return itemResults;
     }
 
