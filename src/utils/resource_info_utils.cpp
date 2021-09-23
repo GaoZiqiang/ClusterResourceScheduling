@@ -9,7 +9,6 @@ Input@fileName:操作系统的文件子系统使用配置文件 /proc/mtab
 Return@disk_free_percent:节点的磁盘空闲率
 *************************************************/
     double calDiskInfo() {
-        cout << "calDiskInfo time: " << clock() << endl;
         SysDiskInfo *sys_disk_info = (SysDiskInfo *)malloc(sizeof(SysDiskInfo));
         DiskInfo		*disk_info;
         struct statfs	fs_info;// 储存文件系统相关的信息
@@ -168,10 +167,9 @@ Function:calMemInfo
 Description:计算节点的内存使用率和空闲率
 
 Input@MEM_OCCUPY m:内存资源使用情况
-Return@mem_free_percent_user:从应用程序角度看的内存空闲率
+Return@mem_free_percent_user:从操作系统角度看的内存空闲率
 *************************************************/
     double calMemInfo() {
-        cout << "calMemInfo time: " << clock() << endl;
         //获取内存
         //(MemTotal - MemFree)/ MemTotal
         MEM_OCCUPY m;
@@ -182,10 +180,10 @@ Return@mem_free_percent_user:从应用程序角度看的内存空闲率
         double mem_free_percent_user = (m.MemFree + m.Buffers + m.Cached) * 1.0 / (m.MemTotal * 1.0  );
         /*从操作系统的角度*/
         double mem_free_percent_os = m.MemFree * 1.0 / (m.MemTotal * 1.0  );
-        printf("内存空闲率_应用程序角度：%.3f\n", mem_free_percent_user);
-        printf("内存空闲率_操作系统角度：%.3f\n", mem_free_percent_os);
+        // printf("内存空闲率_应用程序角度：%.3f\n", mem_free_percent_user);
+        printf("内存空闲率：%.3f\n", mem_free_percent_os);
 
-        return mem_free_percent_user;// 从应用程序角度
+        return mem_free_percent_os;// 从应用程序角度
     }
 
 
@@ -228,8 +226,6 @@ Input@CPU_OCCUPY cpu_stat1 & CPU_OCCUPY cpu_stat2:CPU资源使用情况
 Return@cpu_free_percent:CPU空闲率
 *************************************************/
     double calCPUInfo() {
-        cout << "calCPUInfo time: " << clock() << endl;
-        cout << endl;
         // 要不要把这两个cpu_stat作为形参？
         CPU_OCCUPY cpu_stat1;
         CPU_OCCUPY cpu_stat2;
@@ -313,7 +309,6 @@ Input@xxx:一段时间间隔
 Return@net_free_percent:网络带宽空闲率
 *************************************************/
     double calNetworkInfo() {
-        cout << "calNetworkInfo time: " << clock() << endl;
         /*网络带宽,Mbps：每秒传输百万位*/
         static float totalBandWidth = 1000;
 
@@ -343,7 +338,7 @@ Return@net_free_percent:网络带宽空闲率
         double net_usage = avg_rate / totalBandWidth;
 
         double net_free_percent = 1.0 - net_usage;
-        printf("网络带宽空闲率:%f\n",net_free_percent);
+        printf("网络带宽空闲率:%.3f\n",net_free_percent);
 
         return net_free_percent;
     }
