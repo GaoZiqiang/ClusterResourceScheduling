@@ -1,0 +1,21 @@
+all:server
+
+# 链接--链接mysql_config.o mysql_tools.o server.o三个.o文件为一个可执行文件
+server:mysql_config.o mysql_tools.o server.o
+	g++ -o server mysql_config.o mysql_tools.o server.o -lpthread -lmysqlclient
+
+# 编译mysql_config.o--其所需要的.h文件不需显示标注--.cpp文件中已经include了
+mysql_config.o:mysql_config.cpp
+	g++ -c -o mysql_config.o mysql_config.cpp
+
+# 编译mysql_tools.o
+mysql_tools.o:mysql_tools.cpp
+	g++ -c -o mysql_tools.o mysql_tools.cpp
+
+# 编译server.o
+server.o:web_serv.cpp
+	g++ -c -o server.o web_serv.cpp
+
+clean:
+	rm -rf server
+
