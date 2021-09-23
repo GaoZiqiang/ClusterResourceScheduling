@@ -29,10 +29,10 @@ string calculateNodeLoad::calculateTotalLoad(double * weights) {
     /*1 获取各项资源的指标值*/
     double R_cpu,R_mem,R_net,R_disk;
 
-    R_cpu = resource::calCPUInfo();
-    R_mem = resource::calMemInfo();
-    R_net = resource::calNetworkInfo();
-    R_disk = resource::calDiskInfo();
+    R_cpu = 1.0 - resource::calCPUInfo();
+    R_mem = 1.0 - resource::calMemInfo();
+    R_net = 1.0 - resource::calNetworkInfo();
+    R_disk = 1.0 - resource::calDiskInfo();
 
     // 多线程并发执行--还有待优化
 //    thread thread_cpu(calCPUInfo);
@@ -49,10 +49,9 @@ string calculateNodeLoad::calculateTotalLoad(double * weights) {
 //    static double *weights = getAHPParams(param_file);// 只需要定义一个指针数组的首指针即可（或者说只需要定义一个指针即可！！！）
 
     /*计算节点总负载*/
-    double free_score = weights[0] * R_cpu + weights[1] * R_mem + weights[2] * R_net + weights[3] * R_disk;
+    node_load = weights[0] * R_cpu + weights[1] * R_mem + weights[2] * R_net + weights[3] * R_disk;
     // weights用完后要及时释放--本质是释放指针所指向的内存空间，而不是删除指针本身
 //    delete [] weights;
-    node_load = 1.0 - free_score;
     cout << "节点综合负载：" << node_load << endl;
 
     node_info = {

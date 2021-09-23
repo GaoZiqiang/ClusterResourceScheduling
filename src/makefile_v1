@@ -1,0 +1,32 @@
+all:main
+
+main:calculate_load.o schedule.o resource_info_utils.o mysql_config.o mysql_tools.o redis_config.o redis_tools.o main.o
+	g++ -o main calculate_load/calculate_load.o resource_schedule/schedule.o utils/resource_info_utils.o utils/mysql/mysql_config.o utils/mysql/mysql_tools.o utils/redis/redis_config.o utils/redis/redis_tools.o main.o -L/usr/local/lib/ -lhiredis -lmysqlclient
+
+calculate_load.o:calculate_load/calculate_load.cpp
+	g++ -c -o calculate_load/calculate_load.o calculate_load/calculate_load.cpp
+
+schedule.o:resource_schedule/schedule.cpp
+	g++ -c -o resource_schedule/schedule.o resource_schedule/schedule.cpp
+
+resource_info_utils.o:utils/resource_info_utils.cpp
+	g++ -c -o utils/resource_info_utils.o utils/resource_info_utils.cpp
+
+mysql_config.o:utils/mysql/mysql_config.cpp
+	g++ -c -o utils/mysql/mysql_config.o utils/mysql/mysql_config.cpp
+
+mysql_tools.o:utils/mysql/mysql_tools.cpp
+	g++ -c -o utils/mysql/mysql_tools.o utils/mysql/mysql_tools.cpp
+
+redis_config.o:utils/redis/redis_config.cpp
+	g++ -c -o utils/redis/redis_config.o utils/redis/redis_config.cpp
+
+redis_tools.o:utils/redis/redis_tools.cpp
+	g++ -c -o utils/redis/redis_tools.o utils/redis/redis_tools.cpp
+
+main.o:main.cpp
+	g++ -c -o main.o main.cpp
+
+clean:
+	rm -rf main
+
