@@ -77,12 +77,16 @@ namespace resource {
         unsigned int softirq;
     }CPU_OCCUPY;
 
+    /*计算磁盘使用率*/
     double calDiskInfo();
+    /*计算内存使用率*/
     void getMemOccupy(MEM_OCCUPY *mem);
-    void getCPUOccupy(CPU_OCCUPY *cpust);
     double calMemInfo();
+    /*计算CPU使用率*/
+    void getCPUOccupy(CPU_OCCUPY *cpust);
     double calCPUInfoBase(CPU_OCCUPY *o, CPU_OCCUPY *n);
     double calCPUInfo();
+    /*计算网络带宽使用率*/
     long long* getNetworkOccupy();
     double calNetworkInfo();
 }
