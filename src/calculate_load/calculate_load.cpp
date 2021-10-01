@@ -7,6 +7,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -29,10 +30,10 @@ string calculateNodeLoad::calculateTotalLoad(double * weights) {
     /*1 获取各项资源的指标值*/
     double R_cpu,R_mem,R_net,R_disk;
 
-    R_cpu = 1.0 - resource::calCPUInfo();
-    R_mem = 1.0 - resource::calMemInfo();
-    R_net = 1.0 - resource::calNetworkInfo();
-    R_disk = 1.0 - resource::calDiskInfo();
+    R_cpu = (resource::calCPUInfo() > 1.0) ? abs(1.0 - resource::calCPUInfo()) : 1.0 - resource::calCPUInfo();
+    R_mem = (resource::calMemInfo() > 1.0) ? abs(1.0 - resource::calMemInfo()) : 1.0 - resource::calMemInfo();
+    R_disk = (resource::calDiskInfo() > 1.0) ? abs(1.0 - resource::calDiskInfo()) : 1.0 - resource::calDiskInfo();
+    R_net = (resource::calNetworkInfo() > 1.0) ?abs(1.0 - resource::calNetworkInfo()) : 1.0 - resource::calNetworkInfo();
 
     // 多线程并发执行--还有待优化
 //    thread thread_cpu(calCPUInfo);
@@ -48,7 +49,7 @@ string calculateNodeLoad::calculateTotalLoad(double * weights) {
     /*2 各项指标权重*/
 //    static double *weights = getAHPParams(param_file);// 只需要定义一个指针数组的首指针即可（或者说只需要定义一个指针即可！！！）
 
-    /*计算节点总负载*/
+    /*计算节点综合负载*/
     node_load = weights[0] * R_cpu + weights[1] * R_mem + weights[2] * R_net + weights[3] * R_disk;
     // weights用完后要及时释放--本质是释放指针所指向的内存空间，而不是删除指针本身
 //    delete [] weights;
