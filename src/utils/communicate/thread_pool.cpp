@@ -52,7 +52,7 @@ ThreadPool::ThreadPool(int minNum, int maxNum)
 ThreadPool::~ThreadPool()
 {
     m_shutdown = 1;
-    // 销毁管理者线程
+    // 阻塞--等待管理者线程结束--由主线程回收线程资源
     pthread_join(m_managerID, NULL);
     // 唤醒所有消费者线程
     for (int i = 0; i < m_aliveNum; ++i)
@@ -188,6 +188,8 @@ void* ThreadPool::manager(void* arg)
                 if (pool->m_threadIDs[i] == 0)
                 {
                     pthread_create(&pool->m_threadIDs[i], NULL, worker, pool);
+                    if (pthread_detach(pool->m_threadIDs[i]) != 0)
+                        printf("pthread_detach失败!\n");
                     printf("线程池中添加新线程\n");
                     num++;
                     pool->m_aliveNum++;
@@ -228,5 +230,8 @@ void ThreadPool::threadExit()
             break;
         }
     }
+    // 线程退出
     pthread_exit(NULL);
+
+    // pthread_join(pthread_self());
 }

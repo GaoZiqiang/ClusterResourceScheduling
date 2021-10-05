@@ -91,6 +91,8 @@ void request_handler(void *arg)
             write(clnt_sock, buf, str_len);    // echo!
         }
     }
+
+    return 0;
 }
 
 void send_data(FILE* fp, char* ct, char* file_name)

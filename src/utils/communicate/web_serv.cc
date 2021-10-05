@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 			n,inet_ntoa(clnt_adr.sin_addr), ntohs(clnt_adr.sin_port));
 		//printf("before pthread_create\n");
 		pthread_create(&t_id, NULL, request_handler, (socklen_t*)&clnt_sock);
+		// 非阻塞--线程结束后自动释放资源
 		pthread_detach(t_id);
         //printf("after pthread_create\n");
 	}
@@ -68,57 +69,22 @@ void* request_handler(void *arg)
 
 	char message[500];
 	
-	char method[10];// method??????
+	char method[10];
 	char ct[15];
 	char file_name[30];
-
-//    int str_len = read(clnt_sock,message,sizeof(message)-1);
-//    if (str_len != -1)
-//        printf("message: %s\n",message);
 
 	clnt_read=fdopen(clnt_sock, "r");
 	clnt_write=fdopen(dup(clnt_sock), "w");
 	// only request line?other information?
 	fgets(req_line, 500, clnt_read);
 
-    printf("Get from client: %s",req_line);
+    printf("Get from client: %s\n",req_line);
 
     // 调用mysql接口，将数解析并存入数据库
-//    // ?????http??
-//	if(strstr(req_line, "HTTP/")==NULL)// strstr(str1,str2) ?????????str2???str1???
-//	{
-//		send_error(clnt_write);
-//		fclose(clnt_read);
-//		fclose(clnt_write);
-//		return;
-//	 }
-//
-//	// ??method strtok()????????????method
-//	strcpy(method, strtok(req_line, " /"));// C ??? char *strtok(char *str, const char *delim)????? str ???????delim ????
-//	// ????:????index.html??ct???
-//	strcpy(file_name, strtok(NULL, " /"));// ???????
-//    printf("file_name: %s\n",file_name);
-//	strcpy(ct, content_type(file_name));// ??Content-type
-//    printf("ct: %s\n",ct);
-//
-//	if (!strcmp(method, "GET")) {
-//        fclose(clnt_read);
-//        send_data(clnt_write, ct, file_name); // file_name:a file path
-//	} else if (!strcmp(method, "POST")) {
-//        printf("this is a post request!\n");
-//        fclose(clnt_read);
-////        getParams(req_line);
-//        send_data(clnt_write, ct, file_name); // file_name:a file path
-//	} else {
-//        send_error(clnt_write);
-//        fclose(clnt_read);
-//        fclose(clnt_write);
-//        return;
-//	}
 
     fclose(clnt_read);
     fclose(clnt_write);
-    return 0;
+    return 0;// 子线程终止
 }
 
 void send_data(FILE* fp, char* ct, char* file_name)
