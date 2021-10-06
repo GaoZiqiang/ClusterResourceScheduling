@@ -11,7 +11,7 @@
 #include "resource_schedule/schedule.h"
 #include "remote_procedure_call/receive_nodes_info.h"
 #include "utils/get_ahp_params.h"
-#include "utils/mysql/mysql_tools.h"
+//#include "utils/mysql/mysql_tools.h"
 #include "remote_procedure_call/send_to_center.h"
 
 //#include "utils/resource_info_utils.h"
@@ -137,21 +137,15 @@ int main() {
 //    char param_file[] = "../config/ahp_param.txt";
 //    double *weights = resourceParamsInit(param_file);
 //
-//    uint32_t now_time = 0;
-//    uint32_t last_time = time(0);
-//    int i = 0;
+//    uint32_t now_time = 0, last_time = time(0);
 //
 //    calculateNodeLoad ctd;
 //    NODE_VECTOR_CL node_info;
 //
 //    while (true) {
 //        now_time = time(0);
-////        printf("now_time: %d\n",now_time);
-////        printf("last_time: %d\n",last_time);
-//        if (now_time - last_time >= 10) {
-//            printf("第 %d 次, now_time: %d\n",++i, now_time);
+//        if (now_time - last_time >= 5) {
 //            ctd.calculateTotalLoad(weights);
-////            printf("node_info[0].second: %f\n",node_info[0].second);
 //            last_time = now_time;
 //        }
 //    }
