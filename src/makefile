@@ -1,16 +1,20 @@
 CCC = g++
 LIBS = -L/usr/local/lib/ -lhiredis -lmysqlclient
-GFLAGS = -Icalculate_load -Iresource_schedule -Iutils -Iutils/mysql -Iutils/redis
-OBJS = calculate_load/calculate_load.o resource_schedule/schedule.o utils/resource_info_utils.o utils/mysql/mysql_config.o utils/mysql/mysql_tools.o utils/redis/redis_config.o utils/redis/redis_tools.o main.o
+# CATALOGS = calculate_load resource_schedule utils/mysql utils/redis
+# GFLAGS = -Icalculate_load -Iresource_schedule -Iutils -Iutils/mysql -Iutils/redis
+SRC = $(wildcard calculate_load/*.cpp resource_schedule/*.cpp utils/mysql/*.cpp utils/redis/*.cpp utils/*.cpp ./*.cpp)
+OBJS = $(patsubst %.cpp, %.o, $(SRC))
 TARGET = main
 RM = rm -rf
 
-$(TARGET):$(OBJS)
+$(TARGET) : $(OBJS)
 	$(CCC) -o $(TARGET) $(OBJS) $(LIBS)
 
-$(OBJS):%.o:%.cpp
-	$(CCC) -c $(GFLAGS) $^ -o $@
+$(OBJS) : %.o:%.cpp
+	$(CCC) -c $^ -o $@
 
+.PHONY : clean
 clean:
 	$(RM) $(TARGET) $(OBJS)
+
 
